@@ -1,4 +1,5 @@
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,8 @@ class RiskManager:
     """
 
     def __init__(self, starting_equity: float):
+        if isinstance(starting_equity, bool) or not isinstance(starting_equity, (int, float)) or not math.isfinite(starting_equity) or starting_equity <= 0:
+            raise ValueError("starting equity must be positive and finite")
         self._eq = starting_equity
         self.current_pnl: float = 0.0
         self.done: bool = False
