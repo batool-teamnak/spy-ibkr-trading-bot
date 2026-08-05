@@ -33,6 +33,9 @@ class RiskManager:
         if self.done:
             return None
 
+        if not isinstance(daily_pnl, (int, float)) or not math.isfinite(daily_pnl):
+            logger.warning("Ignoring invalid daily PnL: %r", daily_pnl)
+            return None
         if self._pnl_baseline is None:
             self._pnl_baseline = daily_pnl
             logger.info("PnL baseline (9:30am RTH): %.2f", self._pnl_baseline)

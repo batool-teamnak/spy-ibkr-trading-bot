@@ -31,3 +31,11 @@ class TradingTests(unittest.TestCase):
         risk = RiskManager(10000)
         risk.check(100)
         self.assertIn('hard_sl', risk.check(-101))
+
+    def test_invalid_pnl_does_not_poison_risk_state(self):
+        risk = RiskManager(10000)
+        for pnl in (None, float('nan'), float('inf')):
+            self.assertIsNone(risk.check(pnl))
+        self.assertIsNone(risk._pnl_baseline)
+        risk.check(100)
+        self.assertIn('hard_sl', risk.check(-101))
