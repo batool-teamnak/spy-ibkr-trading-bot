@@ -75,6 +75,8 @@ class RiskManager:
     def check_noon(self, pnl: float) -> bool:
         if self.done:
             return False
+        if not isinstance(pnl, (int, float)) or not math.isfinite(pnl):
+            return False
         if pnl / self._eq < 0.045:
             self.done = True
             return True

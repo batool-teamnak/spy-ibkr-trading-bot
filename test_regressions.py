@@ -39,3 +39,10 @@ class TradingTests(unittest.TestCase):
         self.assertIsNone(risk._pnl_baseline)
         risk.check(100)
         self.assertIn('hard_sl', risk.check(-101))
+
+    def test_invalid_timed_pnl_preserves_state(self):
+        risk = RiskManager(10000)
+        for pnl in (None, float('nan'), float('inf')):
+            self.assertFalse(risk.check_noon(pnl))
+            self.assertFalse(risk.done)
+        self.assertTrue(risk.check_noon(400))
