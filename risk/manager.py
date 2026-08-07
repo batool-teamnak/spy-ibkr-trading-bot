@@ -61,8 +61,9 @@ class RiskManager:
             logger.info("TP2 armed @ pnl=%.2f", pnl)
 
         if self._tp2_armed:
-            while pct >= self._tp2_peak_pct + 0.10:
-                self._tp2_peak_pct += 0.10
+            steps = max(0, math.floor((pct - self._tp2_peak_pct + 1e-12) / 0.10))
+            if steps:
+                self._tp2_peak_pct += steps * 0.10
                 self._tp2_trail = self._eq * (self._tp2_peak_pct - 0.005)
                 logger.info("TP2 trail extended: peak=%.0f%% trail=%.2f",
                             self._tp2_peak_pct * 100, self._tp2_trail)

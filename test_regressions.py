@@ -46,3 +46,15 @@ class TradingTests(unittest.TestCase):
             self.assertFalse(risk.check_noon(pnl))
             self.assertFalse(risk.done)
         self.assertTrue(risk.check_noon(400))
+
+    def test_trailing_profit_gap_and_retrace(self):
+        risk = RiskManager(10000)
+        risk.check(0)
+        self.assertIsNone(risk.check(3050))
+        self.assertAlmostEqual(risk._tp2_peak_pct, .305)
+        self.assertAlmostEqual(risk._tp2_trail, 3000)
+        self.assertIn('tp2', risk.check(2999))
+        huge = RiskManager(10000)
+        huge.check(0)
+        huge.check(1e12)
+        self.assertGreater(huge._tp2_trail, 1e11)
