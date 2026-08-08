@@ -58,3 +58,7 @@ class TradingTests(unittest.TestCase):
         huge.check(0)
         huge.check(1e12)
         self.assertGreater(huge._tp2_trail, 1e11)
+
+    def test_insufficient_margin_returns_no_position(self):
+        self.assertEqual(utils.calc_leg_qty(100, 200), 0)
+        self.assertEqual(utils.calc_leg_qty(1000, 100), 9)

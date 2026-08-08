@@ -18,7 +18,7 @@ def calc_leg_qty(equity: float, margin_per_share: float) -> int:
     # spec: (ELV - 2%) / Sell SPY Initial Margin, floor
     if margin_per_share <= 0:
         return 0
-    return max(1, math.floor(equity * 0.98 / margin_per_share))
+    return max(0, math.floor(equity * 0.98 / margin_per_share))
 
 
 def parse_trading_hours(raw: str) -> list[tuple[datetime.datetime, datetime.datetime]]:
