@@ -16,7 +16,8 @@ def et_time(hour: int, minute: int, second: int = 0) -> datetime.datetime:
 
 def calc_leg_qty(equity: float, margin_per_share: float) -> int:
     # spec: (ELV - 2%) / Sell SPY Initial Margin, floor
-    if margin_per_share <= 0:
+    if any(not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0
+           for v in (equity, margin_per_share)):
         return 0
     return max(0, math.floor(equity * 0.98 / margin_per_share))
 

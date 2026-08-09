@@ -62,3 +62,7 @@ class TradingTests(unittest.TestCase):
     def test_insufficient_margin_returns_no_position(self):
         self.assertEqual(utils.calc_leg_qty(100, 200), 0)
         self.assertEqual(utils.calc_leg_qty(1000, 100), 9)
+
+    def test_sizing_invalid_inputs_are_zero(self):
+        for equity, margin in ((float('nan'),100),(100,float('inf')),(100,0),(-1,100),(None,100)):
+            self.assertEqual(utils.calc_leg_qty(equity,margin), 0)
