@@ -27,14 +27,18 @@ def parse_trading_hours(raw: str) -> list[tuple[datetime.datetime, datetime.date
     sessions = []
     for seg in raw.split(";"):
         seg = seg.strip()
-        if today not in seg or "CLOSED" in seg:
+        if not seg.startswith(today + ":") or "CLOSED" in seg:
             continue
-        m = re.match(r"(\d{8}):(\d{4})-(\d{8}):(\d{4})", seg)
+        m = re.fullmatch(r"(\d{8}):(\d{4})-(\d{8}):(\d{4})", seg)
         if not m:
             continue
-        open_dt  = datetime.datetime.strptime(m.group(1) + m.group(2), "%Y%m%d%H%M").replace(tzinfo=ET)
-        close_dt = datetime.datetime.strptime(m.group(3) + m.group(4), "%Y%m%d%H%M").replace(tzinfo=ET)
-        sessions.append((open_dt, close_dt))
+        try:
+            open_dt = datetime.datetime.strptime(m.group(1) + m.group(2), "%Y%m%d%H%M").replace(tzinfo=ET)
+            close_dt = datetime.datetime.strptime(m.group(3) + m.group(4), "%Y%m%d%H%M").replace(tzinfo=ET)
+        except ValueError:
+            continue
+        if close_dt > open_dt:
+            sessions.append((open_dt, close_dt))
     return sessions
 
 

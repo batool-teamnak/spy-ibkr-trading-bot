@@ -66,3 +66,11 @@ class TradingTests(unittest.TestCase):
     def test_sizing_invalid_inputs_are_zero(self):
         for equity, margin in ((float('nan'),100),(100,float('inf')),(100,0),(-1,100),(None,100)):
             self.assertEqual(utils.calc_leg_qty(equity,margin), 0)
+
+    def test_trading_hours_skip_corrupt_and_previous_sessions(self):
+        day = datetime.datetime(2026,7,6,10,tzinfo=utils.ET)
+        raw = '20260705:2000-20260706:0800;20260706:9999-20260706:1600;20260706:0930-20260706:1600'
+        with patch.object(utils, 'now_et', return_value=day):
+            sessions = utils.parse_trading_hours(raw)
+        self.assertEqual(len(sessions), 1)
+        self.assertEqual(sessions[0][0].hour, 9)
