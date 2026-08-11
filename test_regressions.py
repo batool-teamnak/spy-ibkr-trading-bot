@@ -74,3 +74,8 @@ class TradingTests(unittest.TestCase):
             sessions = utils.parse_trading_hours(raw)
         self.assertEqual(len(sessions), 1)
         self.assertEqual(sessions[0][0].hour, 9)
+
+    def test_split_session_is_not_an_early_close(self):
+        with patch.object(utils, 'now_et', return_value=datetime.datetime(2026,7,6,10,tzinfo=utils.ET)):
+            self.assertFalse(utils.is_early_close('20260706:0930-20260706:1200;20260706:1300-20260706:1600'))
+            self.assertTrue(utils.is_early_close('20260706:0930-20260706:1300'))

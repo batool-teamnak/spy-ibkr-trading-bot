@@ -44,4 +44,4 @@ def parse_trading_hours(raw: str) -> list[tuple[datetime.datetime, datetime.date
 
 def is_early_close(raw: str) -> bool:
     sessions = parse_trading_hours(raw)
-    return not sessions or sessions[0][1] < et_time(16, 0)
+    return not sessions or max(close for _, close in sessions) < et_time(16, 0)
