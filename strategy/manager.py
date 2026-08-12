@@ -299,6 +299,18 @@ class OrderManager:
         # OCO removed (NADIR6/7): Y and Z are independent orders.
         # When one fills, the other is cancelled in code (_on_y_parent_filled / _on_z_parent_filled).
         # Parent = 1 share STP trigger; child = leg-1 MKT for total leg shares.
+        if self._leg < 1:
+            self._pending = False
+            return
+        if self._leg == 1:
+            yp = stp("BUY", 1, buy_px, transmit=True); yp.orderId = y_pid
+            zp = stp("SELL", 1, sell_px, transmit=True); zp.orderId = z_pid
+            self._app.placeOrder(y_pid, CONTRACT, yp)
+            self._app.placeOrder(z_pid, CONTRACT, zp)
+            self._y = OrderGroup(y_pid, 0, Side.LONG, 1, entry_price=buy_px)
+            self._z = OrderGroup(z_pid, 0, Side.SHORT, 1, entry_price=sell_px)
+            self._pending = True
+            return
         yp = stp("BUY",  1,             buy_px,  transmit=False);  yp.orderId = y_pid
         yc = mkt("BUY",  self._leg - 1, y_pid,   transmit=True);   yc.orderId = y_cid
         zp = stp("SELL", 1,             sell_px, transmit=False);  zp.orderId = z_pid

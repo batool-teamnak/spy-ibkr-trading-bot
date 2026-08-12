@@ -79,3 +79,14 @@ class TradingTests(unittest.TestCase):
         with patch.object(utils, 'now_et', return_value=datetime.datetime(2026,7,6,10,tzinfo=utils.ET)):
             self.assertFalse(utils.is_early_close('20260706:0930-20260706:1200;20260706:1300-20260706:1600'))
             self.assertTrue(utils.is_early_close('20260706:0930-20260706:1300'))
+
+    def test_single_share_entry_has_no_empty_child(self):
+        app = MagicMock()
+        app.next_id.side_effect = range(1,100)
+        manager = OrderManager(app, 1)
+        manager._open = 500
+        asyncio.run(manager._place_yz())
+        self.assertEqual(app.placeOrder.call_count, 2)
+        for call in app.placeOrder.call_args_list:
+            self.assertEqual(call.args[2].totalQuantity, 1)
+            self.assertTrue(call.args[2].transmit)
