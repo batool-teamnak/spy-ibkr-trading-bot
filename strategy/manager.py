@@ -325,14 +325,19 @@ class OrderManager:
         logger.info("Y/Z placed: BUY=%.2f SELL=%.2f (entries so far=%d)", buy_px, sell_px, self._entries)
 
     async def _place_stp3(self, action: str, stop_px: float, reverse: bool = False):
+        if self._pos_qty < 1:
+            return
         self._placing_stp3 = True
         pid, cid = self._app.next_id(), self._app.next_id()
         # Use actual filled position size, not assumed leg_qty
         child_qty = (2 * self._pos_qty - 1) if reverse else (self._pos_qty - 1)
-        p = stp(action, 1, stop_px, transmit=False); p.orderId = pid
-        c = mkt(action, child_qty, pid, transmit=True); c.orderId = cid
+        p = stp(action, 1, stop_px, transmit=(child_qty == 0)); p.orderId = pid
         self._app.placeOrder(pid, CONTRACT, p)
-        self._app.placeOrder(cid, CONTRACT, c)
+        if child_qty > 0:
+            c = mkt(action, child_qty, pid, transmit=True); c.orderId = cid
+            self._app.placeOrder(cid, CONTRACT, c)
+        else:
+            cid = 0
         self._s3_pid, self._s3_cid, self._s3_px = pid, cid, stop_px
         self._s3_qty = 1 + child_qty
         self._s3_reverse = reverse

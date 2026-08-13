@@ -90,3 +90,13 @@ class TradingTests(unittest.TestCase):
         for call in app.placeOrder.call_args_list:
             self.assertEqual(call.args[2].totalQuantity, 1)
             self.assertTrue(call.args[2].transmit)
+
+    def test_single_share_protective_stop(self):
+        app = MagicMock()
+        app.next_id.side_effect = range(1,100)
+        manager = OrderManager(app,1)
+        manager._pos_qty = 1
+        asyncio.run(manager._place_stp3('SELL',499.99))
+        app.placeOrder.assert_called_once()
+        self.assertTrue(app.placeOrder.call_args.args[2].transmit)
+        self.assertEqual(manager._s3_cid,0)
