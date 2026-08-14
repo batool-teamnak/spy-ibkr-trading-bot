@@ -100,3 +100,9 @@ class TradingTests(unittest.TestCase):
         app.placeOrder.assert_called_once()
         self.assertTrue(app.placeOrder.call_args.args[2].transmit)
         self.assertEqual(manager._s3_cid,0)
+
+    def test_invalid_order_requests_are_rejected(self):
+        for action, qty in (('buy',1),('BUY',0),('SELL',-1),('BUY',1.5),('SELL',True)):
+            with self.assertRaises(ValueError):
+                orders.mkt(action,qty,0,True)
+        self.assertEqual(orders.mkt('BUY',2,0,True).totalQuantity,2)

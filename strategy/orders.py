@@ -32,6 +32,10 @@ def set_account(account: str):
 
 
 def _base(action: str, qty: int, transmit: bool) -> Order:
+    if action not in ("BUY", "SELL"):
+        raise ValueError("order action must be BUY or SELL")
+    if isinstance(qty, bool) or not isinstance(qty, int) or qty <= 0:
+        raise ValueError("share quantity must be a positive integer")
     o = Order()
     o.action = action
     o.totalQuantity = qty
