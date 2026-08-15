@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import math
+from decimal import Decimal, ROUND_HALF_UP
 from enum import Enum, auto
 
 from ibapi.order import Order
@@ -51,9 +53,14 @@ def _base(action: str, qty: int, transmit: bool) -> Order:
 
 
 def stp(action: str, qty: int, stop_px: float, transmit: bool, parent_id: int = 0) -> Order:
+    if not isinstance(stop_px, (int, float)) or not math.isfinite(stop_px) or stop_px <= 0:
+        raise ValueError("stop price must be positive and finite")
+    rounded = float(Decimal(str(stop_px)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+    if rounded <= 0:
+        raise ValueError("stop price rounds below the minimum tick")
     o = _base(action, qty, transmit)
     o.orderType = "STP"
-    o.auxPrice = round(round(stop_px / 0.01) * 0.01, 2)
+    o.auxPrice = rounded
     if parent_id:
         o.parentId = parent_id
     return o

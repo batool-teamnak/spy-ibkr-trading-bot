@@ -106,3 +106,9 @@ class TradingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 orders.mkt(action,qty,0,True)
         self.assertEqual(orders.mkt('BUY',2,0,True).totalQuantity,2)
+
+    def test_stop_prices_and_half_tick_rounding(self):
+        for price in (0,-1,float('nan'),float('inf'),.001):
+            with self.assertRaises(ValueError):
+                orders.stp('SELL',1,price,True)
+        self.assertEqual(orders.stp('SELL',1,100.005,True).auxPrice,100.01)
