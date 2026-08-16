@@ -52,6 +52,11 @@ def _base(action: str, qty: int, transmit: bool) -> Order:
     return o
 
 
+def _parent_id(value):
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError("parent order ID must be a nonnegative integer")
+    return value
+
 def stp(action: str, qty: int, stop_px: float, transmit: bool, parent_id: int = 0) -> Order:
     if not isinstance(stop_px, (int, float)) or not math.isfinite(stop_px) or stop_px <= 0:
         raise ValueError("stop price must be positive and finite")
@@ -61,6 +66,7 @@ def stp(action: str, qty: int, stop_px: float, transmit: bool, parent_id: int = 
     o = _base(action, qty, transmit)
     o.orderType = "STP"
     o.auxPrice = rounded
+    parent_id = _parent_id(parent_id)
     if parent_id:
         o.parentId = parent_id
     return o
@@ -69,5 +75,5 @@ def stp(action: str, qty: int, stop_px: float, transmit: bool, parent_id: int = 
 def mkt(action: str, qty: int, parent_id: int, transmit: bool) -> Order:
     o = _base(action, qty, transmit)
     o.orderType = "MKT"
-    o.parentId = parent_id
+    o.parentId = _parent_id(parent_id)
     return o

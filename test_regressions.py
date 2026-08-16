@@ -112,3 +112,11 @@ class TradingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 orders.stp('SELL',1,price,True)
         self.assertEqual(orders.stp('SELL',1,100.005,True).auxPrice,100.01)
+
+    def test_parent_ids_are_validated(self):
+        for parent in (-1,True,1.5,'2'):
+            with self.assertRaises(ValueError):
+                orders.mkt('BUY',1,parent,True)
+            with self.assertRaises(ValueError):
+                orders.stp('BUY',1,500,True,parent)
+        self.assertEqual(orders.mkt('BUY',1,9,True).parentId,9)
