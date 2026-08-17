@@ -120,3 +120,9 @@ class TradingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 orders.stp('BUY',1,500,True,parent)
         self.assertEqual(orders.mkt('BUY',1,9,True).parentId,9)
+
+    def test_account_selection_is_normalized(self):
+        orders.set_account(' DU123 ')
+        self.assertEqual(orders.mkt('BUY',1,0,True).account,'DU123')
+        with self.assertRaises(ValueError):
+            orders.set_account(None)

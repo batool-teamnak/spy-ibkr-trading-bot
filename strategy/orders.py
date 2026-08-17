@@ -30,7 +30,9 @@ _ACCOUNT = ""
 def set_account(account: str):
     """Target account for all orders — required when the login has >1 account."""
     global _ACCOUNT
-    _ACCOUNT = account
+    if not isinstance(account, str):
+        raise ValueError("account must be text")
+    _ACCOUNT = account.strip()
 
 
 def _base(action: str, qty: int, transmit: bool) -> Order:
