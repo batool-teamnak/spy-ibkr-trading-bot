@@ -11,6 +11,7 @@ del _log_fd, _os
 import asyncio
 import json
 import logging
+import math
 import signal
 import sys
 import time
@@ -88,6 +89,8 @@ async def tick_loop(app, candles: CandleBuilder, sim_sl_one: SimStopLoss, sim_sl
 
         tick_type, price, ts = event["tickType"], event["price"], event["ts"]
 
+        if any(not isinstance(v, (int, float)) or not math.isfinite(v) for v in (price, ts)) or price <= 0:
+            continue
         if ts < session_start_ts:
             continue
 

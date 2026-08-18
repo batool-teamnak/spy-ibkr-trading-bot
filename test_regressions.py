@@ -126,3 +126,13 @@ class TradingTests(unittest.TestCase):
         self.assertEqual(orders.mkt('BUY',1,0,True).account,'DU123')
         with self.assertRaises(ValueError):
             orders.set_account(None)
+
+    def test_invalid_ticks_do_not_create_candles(self):
+        builder = CandleBuilder()
+        for price, ts in ((float('nan'),60),(-1,60),(500,float('inf')),(500,-1)):
+            with self.assertRaises(ValueError):
+                builder.process_tick(price,ts)
+        self.assertIsNone(builder.current)
+        candle, fresh = builder.process_tick(500,60)
+        self.assertTrue(fresh)
+        self.assertEqual(candle.ticks,1)
