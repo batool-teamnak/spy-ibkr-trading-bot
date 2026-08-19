@@ -106,6 +106,8 @@ async def tick_loop(app, candles: CandleBuilder, sim_sl_one: SimStopLoss, sim_sl
         if now_et() >= session_end:
             break
 
+        if candles._last_ts is not None and ts < candles._last_ts:
+            continue
         candle, is_new = candles.process_tick(price, ts)
         prev_close = last_price
         last_price = price

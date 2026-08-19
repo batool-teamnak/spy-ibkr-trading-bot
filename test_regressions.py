@@ -136,3 +136,13 @@ class TradingTests(unittest.TestCase):
         candle, fresh = builder.process_tick(500,60)
         self.assertTrue(fresh)
         self.assertEqual(candle.ticks,1)
+
+    def test_late_ticks_preserve_current_close(self):
+        builder = CandleBuilder()
+        builder.process_tick(500,120)
+        builder.process_tick(501,130)
+        candle, fresh = builder.process_tick(499,125)
+        self.assertFalse(fresh)
+        self.assertEqual((candle.close,candle.ticks),(501,2))
+        builder.process_tick(490,60)
+        self.assertEqual(builder.current.minute_ts,120)
