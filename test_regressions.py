@@ -146,3 +146,13 @@ class TradingTests(unittest.TestCase):
         self.assertEqual((candle.close,candle.ticks),(501,2))
         builder.process_tick(490,60)
         self.assertEqual(builder.current.minute_ts,120)
+
+    def test_candle_history_keeps_latest_records(self):
+        builder = CandleBuilder(max_history=2)
+        for ts in (60,120,180,240):
+            builder.process_tick(500,ts)
+        builder.finalize()
+        builder.finalize()
+        self.assertEqual([c.minute_ts for c in builder.history],[180,240])
+        with self.assertRaises(ValueError):
+            CandleBuilder(max_history=0)

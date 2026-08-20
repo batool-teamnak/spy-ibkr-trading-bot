@@ -24,7 +24,10 @@ class Candle:
 
 
 class CandleBuilder:
-    def __init__(self):
+    def __init__(self, max_history=10000):
+        if isinstance(max_history, bool) or not isinstance(max_history, int) or max_history <= 0:
+            raise ValueError("max_history must be a positive integer")
+        self.max_history = max_history
         self.current: Candle | None = None
         self.history: list[Candle] = []
         self._last_ts = None
@@ -43,6 +46,7 @@ class CandleBuilder:
         if is_new:
             if self.current is not None:
                 self.history.append(self.current)
+                del self.history[:-self.max_history]
             self.current = Candle(minute_ts=minute_ts)
 
         self.current.update(price)
@@ -54,4 +58,5 @@ class CandleBuilder:
     def finalize(self):
         if self.current is not None:
             self.history.append(self.current)
+            del self.history[:-self.max_history]
             self.current = None
