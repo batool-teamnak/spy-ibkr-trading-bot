@@ -53,7 +53,7 @@ class CandleBuilder:
         return self.current, is_new
 
     def seconds_into_candle(self, ts: float) -> float:
-        return (ts - self.current.minute_ts) if self.current else 0.0
+        return min(60.0, max(0.0, ts - self.current.minute_ts)) if self.current else 0.0
 
     def finalize(self):
         if self.current is not None:

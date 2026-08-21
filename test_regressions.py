@@ -156,3 +156,10 @@ class TradingTests(unittest.TestCase):
         self.assertEqual([c.minute_ts for c in builder.history],[180,240])
         with self.assertRaises(ValueError):
             CandleBuilder(max_history=0)
+
+    def test_candle_elapsed_time_bounds(self):
+        builder = CandleBuilder()
+        builder.process_tick(500,120)
+        self.assertEqual(builder.seconds_into_candle(100),0)
+        self.assertEqual(builder.seconds_into_candle(179),59)
+        self.assertEqual(builder.seconds_into_candle(999),60)
