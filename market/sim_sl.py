@@ -1,4 +1,5 @@
 import logging
+import math
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,8 @@ class SimStopLoss:
     def on_tick(self, price: float) -> int:
         if self._current is None:
             return 0
+        if not isinstance(price, (int, float)) or not math.isfinite(price) or price <= 0:
+            return self._current.sim_sl_hits
 
         if self._state == self.FLAT:
             if price >= self._up:
