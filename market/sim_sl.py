@@ -42,8 +42,10 @@ class SimStopLoss:
         self._stop: float | None = None
 
     def new_candle(self, open_price: float, minute_ts: float, prev_close: float = 0.0):
+        if any(not isinstance(v, (int, float)) or not math.isfinite(v) for v in (open_price, minute_ts)) or open_price <= 0 or minute_ts < 0:
+            raise ValueError("simulated candle needs a positive price and finite timestamp")
         if self._current is not None:
-            if prev_close > 0:
+            if math.isfinite(prev_close) and prev_close > 0:
                 self._current.close_price = prev_close
             self.records.append(self._current)
         self._current = CandleRecord(minute_ts=minute_ts, open_price=open_price)

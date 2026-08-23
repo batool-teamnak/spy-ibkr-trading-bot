@@ -171,3 +171,12 @@ class TradingTests(unittest.TestCase):
         for price in (float('nan'),float('inf'),-1,None):
             self.assertEqual(sim.on_tick(price),0)
             self.assertEqual(sim._state,sim.LONG)
+
+    def test_invalid_sim_candle_preserves_prior_record(self):
+        sim = SimStopLoss()
+        sim.new_candle(500,60)
+        for price,ts in ((float('nan'),120),(500,float('inf')),(-1,120)):
+            with self.assertRaises(ValueError):
+                sim.new_candle(price,ts)
+        self.assertEqual(sim._current.minute_ts,60)
+        self.assertEqual(sim.records,[])
