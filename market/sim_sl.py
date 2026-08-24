@@ -60,6 +60,7 @@ class SimStopLoss:
         if not isinstance(price, (int, float)) or not math.isfinite(price) or price <= 0:
             return self._current.sim_sl_hits
 
+        self._current.close_price = price
         if self._state == self.FLAT:
             if price >= self._up:
                 self._state = self.LONG

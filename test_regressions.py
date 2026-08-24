@@ -180,3 +180,13 @@ class TradingTests(unittest.TestCase):
                 sim.new_candle(price,ts)
         self.assertEqual(sim._current.minute_ts,60)
         self.assertEqual(sim.records,[])
+
+    def test_final_sim_candle_has_observed_close(self):
+        sim = SimStopLoss()
+        sim.new_candle(500,60)
+        sim.on_tick(500.02)
+        sim.on_tick(501)
+        sim.finalize()
+        sim.finalize()
+        self.assertEqual(len(sim.records),1)
+        self.assertEqual(sim.records[0].close_price,501)
