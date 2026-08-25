@@ -71,11 +71,11 @@ def _build_data(sim_records: list[CandleRecord], candles: list[Candle]):
 
         # Total open-close points from candles with < 5 stop loss triggers
         # Match by minute_ts: build a candle close lookup
-        candle_close: dict[float, float] = {}
+        candle_close: dict[float, float] = {c.minute_ts: c.close for c in candles if c.close > 0}
         for r in sim_records:
             if r.close_price > 0:
                 candle_close[r.minute_ts] = r.close_price
-            elif r.open_price > 0:
+            elif r.open_price > 0 and r.minute_ts not in candle_close:
                 candle_close[r.minute_ts] = r.open_price  # fallback: use open
 
         oc_sum = sum(

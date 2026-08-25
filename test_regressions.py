@@ -190,3 +190,10 @@ class TradingTests(unittest.TestCase):
         sim.finalize()
         self.assertEqual(len(sim.records),1)
         self.assertEqual(sim.records[0].close_price,501)
+
+    def test_report_uses_matching_candle_close(self):
+        records = [CandleRecord(60,500,0)]
+        candle = Candle(60,open=500,high=501,low=500,close=501,ticks=2)
+        rows, mean, total = report._build_data(records,[candle])
+        self.assertEqual((mean,total),(1,1))
+        self.assertEqual(rows[0][1],1)
