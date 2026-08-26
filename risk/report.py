@@ -45,7 +45,7 @@ def scan_log_events(log_path: str = _LOG_PATH) -> tuple[int, int]:
 
 def _fmt_time(ts: float) -> str:
     dt = datetime.fromtimestamp(ts, tz=ET)
-    return dt.strftime("%-I:%M:%S") + dt.strftime("%p").lower() + " ET"
+    return str(dt.hour % 12 or 12) + dt.strftime(":%M:%S%p").lower() + " ET"
 
 
 def _build_data(sim_records: list[CandleRecord], candles: list[Candle]):

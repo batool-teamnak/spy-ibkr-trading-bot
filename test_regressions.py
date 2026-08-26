@@ -197,3 +197,8 @@ class TradingTests(unittest.TestCase):
         rows, mean, total = report._build_data(records,[candle])
         self.assertEqual((mean,total),(1,1))
         self.assertEqual(rows[0][1],1)
+
+    def test_report_time_format_at_midnight_and_noon(self):
+        for hour, expected in ((0,'12:00:00am ET'),(12,'12:00:00pm ET'),(15,'3:00:00pm ET')):
+            ts = datetime.datetime(2026,7,6,hour,tzinfo=utils.ET).timestamp()
+            self.assertEqual(report._fmt_time(ts),expected)
