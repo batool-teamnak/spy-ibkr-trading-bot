@@ -202,3 +202,10 @@ class TradingTests(unittest.TestCase):
         for hour, expected in ((0,'12:00:00am ET'),(12,'12:00:00pm ET'),(15,'3:00:00pm ET')):
             ts = datetime.datetime(2026,7,6,hour,tzinfo=utils.ET).timestamp()
             self.assertEqual(report._fmt_time(ts),expected)
+
+    def test_report_unicode_roundtrip(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'report.txt'
+            text = report.generate_report([],[],0,0)
+            report.save_report(text,path)
+            self.assertEqual(path.read_text(encoding='utf-8'),text)

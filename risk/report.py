@@ -205,7 +205,7 @@ def _generate_html(sim_records: list[CandleRecord], candles: list[Candle],
 
 
 def save_report(report: str, path: str = "post_trade_report.txt"):
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(report)
     logger.info("Report saved to %s", path)
 
