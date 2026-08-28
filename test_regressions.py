@@ -209,3 +209,12 @@ class TradingTests(unittest.TestCase):
             text = report.generate_report([],[],0,0)
             report.save_report(text,path)
             self.assertEqual(path.read_text(encoding='utf-8'),text)
+
+    def test_simulation_and_session_configuration(self):
+        with patch.dict(os.environ,{'SIM_ONLY':'true','SIM_SL_END':'12:30','EOD_EXIT':'15:59'}):
+            importlib.reload(config)
+            self.assertTrue(config.SIM_ONLY)
+        with patch.dict(os.environ,{'SIM_SL_END':'25:99'}):
+            with self.assertRaises(ValueError):
+                config._session_time('SIM_SL_END','12:30')
+        importlib.reload(config)
