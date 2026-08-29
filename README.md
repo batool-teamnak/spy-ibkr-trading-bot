@@ -90,3 +90,16 @@ The bot waits until 8:25am ET, checks trading hours, skips early-close days, the
 Trading involves significant risk of loss. Test on a paper account before going live.
 
 
+
+## Offline regression checks
+
+`python -m unittest -v test_regressions` checks risk thresholds, margin sizing,
+order construction, candles, simulated stops, configuration and reporting.
+These checks use fake broker clients and never run `main.py` or submit trades.
+The isolated CI environment uses the public `ibapi` package for order-model
+tests; deploy with the TWS API version listed in the main requirements.
+`SIM_ONLY` accepts `1`, `true`, `yes` or `on` (case insensitive).
+Configured `SIM_SL_END` and `EOD_EXIT` values must be valid `HH:MM` times.
+Unfunded positions size to zero; one-share groups omit zero-quantity children.
+Candle history retains the latest 10,000 records by default, configurable with
+`CandleBuilder(max_history=...)`.
