@@ -328,21 +328,26 @@ class OrderManager:
         if self._pos_qty < 1:
             return
         self._placing_stp3 = True
-        pid, cid = self._app.next_id(), self._app.next_id()
-        # Use actual filled position size, not assumed leg_qty
-        child_qty = (2 * self._pos_qty - 1) if reverse else (self._pos_qty - 1)
-        p = stp(action, 1, stop_px, transmit=(child_qty == 0)); p.orderId = pid
-        self._app.placeOrder(pid, CONTRACT, p)
-        if child_qty > 0:
-            c = mkt(action, child_qty, pid, transmit=True); c.orderId = cid
-            self._app.placeOrder(cid, CONTRACT, c)
-        else:
-            cid = 0
-        self._s3_pid, self._s3_cid, self._s3_px = pid, cid, stop_px
-        self._s3_qty = 1 + child_qty
-        self._s3_reverse = reverse
-        self._placing_stp3 = False
-        logger.info("STP3: %s @ %.2f qty=1+%d reverse=%s", action, stop_px, child_qty, reverse)
+        try:
+            pid, cid = self._app.next_id(), self._app.next_id()
+            # Use actual filled position size, not assumed leg_qty
+            child_qty = (2 * self._pos_qty - 1) if reverse else (self._pos_qty - 1)
+            p = stp(action, 1, stop_px, transmit=(child_qty == 0)); p.orderId = pid
+            self._app.placeOrder(pid, CONTRACT, p)
+            self._s3_pid = pid
+            self._s3_cid = 0
+            if child_qty > 0:
+                c = mkt(action, child_qty, pid, transmit=True); c.orderId = cid
+                self._app.placeOrder(cid, CONTRACT, c)
+                self._s3_cid = cid
+            else:
+                cid = 0
+            self._s3_pid, self._s3_cid, self._s3_px = pid, cid, stop_px
+            self._s3_qty = 1 + child_qty
+            self._s3_reverse = reverse
+            logger.info("STP3: %s @ %.2f qty=1+%d reverse=%s", action, stop_px, child_qty, reverse)
+        finally:
+            self._placing_stp3 = False
 
     def _cancel_stp3(self):
         for oid in (self._s3_pid, self._s3_cid):

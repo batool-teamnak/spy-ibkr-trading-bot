@@ -218,3 +218,17 @@ class TradingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 config._session_time('SIM_SL_END','12:30')
         importlib.reload(config)
+
+    def test_failed_stop_child_keeps_parent_cancellable(self):
+        app = MagicMock()
+        app.next_id.side_effect = range(1,100)
+        app.placeOrder.side_effect = [None,RuntimeError('child rejected')]
+        manager = OrderManager(app,2)
+        manager._pos_qty = 2
+        with self.assertRaises(RuntimeError):
+            asyncio.run(manager._place_stp3('SELL',499.99))
+        self.assertFalse(manager._placing_stp3)
+        self.assertEqual(manager._s3_pid,1)
+        self.assertEqual(manager._s3_cid,0)
+        manager._cancel_stp3()
+        app.cancelOrder.assert_called_once_with(1)
